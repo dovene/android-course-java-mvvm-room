@@ -5,9 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +19,8 @@ import com.dev.androidmvvm.R;
 import com.dev.androidmvvm.model.User;
 import com.dev.androidmvvm.repository.UserRepository;
 
+import java.util.ArrayList;
+
 
 public class UserFragment extends Fragment {
     private RecyclerView recyclerView;
@@ -23,6 +28,15 @@ public class UserFragment extends Fragment {
     private AppCompatButton addButton;
     private AppCompatEditText emailEdit;
     private AppCompatEditText nameEdit;
+    private  UserFragmentViewModel viewModel;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(this).get(UserFragmentViewModel.class);
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,24 +52,31 @@ public class UserFragment extends Fragment {
         addButton = view.findViewById(R.id.addBtn);
         emailEdit = view.findViewById(R.id.emailEdit);
         nameEdit = view.findViewById(R.id.nameEdit);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext(), DividerItemDecoration.VERTICAL));
+
         userAdapter = new UserAdapter(UserRepository.getInstance().getUsers(), new UserAdapter.UserAdapterInterface() {
             @Override
             public void onDelete(User user) {
-                UserRepository.getInstance().deleteUser(user);
-                userAdapter.setUsers(UserRepository.getInstance().getUsers());
-            }
-        });
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                UserRepository.getInstance().addUser(new User(emailEdit.getText().toString(), nameEdit.getText().toString()));
-                userAdapter.setUsers(UserRepository.getInstance().getUsers());
+                viewModel.deleteUser(user);
             }
         });
         recyclerView.setAdapter(userAdapter);
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewModel.addUser(new User(emailEdit.getText().toString(), nameEdit.getText().toString()));
+            }
+        });
+
+        viewModel.usersLivedata.observe(getViewLifecycleOwner(), new Observer<ArrayList<User>>() {
+            @Override
+            public void onChanged(ArrayList<User> users) {
+                userAdapter.setUsers(users);
+            }
+        });
+        viewModel.getUsers();
+
     }
 }
