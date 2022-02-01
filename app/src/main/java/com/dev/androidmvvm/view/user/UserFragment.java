@@ -55,7 +55,7 @@ public class UserFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getContext(), DividerItemDecoration.VERTICAL));
 
-        userAdapter = new UserAdapter(UserRepository.getInstance().getUsers(), new UserAdapter.UserAdapterInterface() {
+        userAdapter = new UserAdapter(new UserAdapter.UserAdapterInterface() {
             @Override
             public void onDelete(User user) {
                 viewModel.deleteUser(user);

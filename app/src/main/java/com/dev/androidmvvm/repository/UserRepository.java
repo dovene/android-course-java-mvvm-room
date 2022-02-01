@@ -8,8 +8,6 @@ public class UserRepository {
 
     private static UserRepository INSTANCE = null;
 
-
-
     private ArrayList<User> users = new ArrayList<>() ;
     private UserRepository(){
     }
