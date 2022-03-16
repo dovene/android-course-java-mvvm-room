@@ -18,7 +18,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserViewHolder>{
     interface UserAdapterInterface {
         void onDelete(User user);
     }
-    private ArrayList<User> users;
+    private ArrayList<User> users = new ArrayList<>();
     private UserAdapterInterface userAdapterInterface;
 
     public UserAdapter(UserAdapterInterface userAdapterInterface){
