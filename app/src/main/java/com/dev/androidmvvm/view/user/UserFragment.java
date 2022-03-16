@@ -1,10 +1,12 @@
 package com.dev.androidmvvm.view.user;
 
+import android.app.Application;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -20,6 +22,7 @@ import com.dev.androidmvvm.model.User;
 import com.dev.androidmvvm.repository.UserRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class UserFragment extends Fragment {
@@ -58,7 +61,7 @@ public class UserFragment extends Fragment {
         userAdapter = new UserAdapter(new UserAdapter.UserAdapterInterface() {
             @Override
             public void onDelete(User user) {
-                viewModel.deleteUser(user);
+                viewModel.deleteUser(user, getContext());
             }
         });
         recyclerView.setAdapter(userAdapter);
@@ -66,17 +69,16 @@ public class UserFragment extends Fragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewModel.addUser(new User(emailEdit.getText().toString(), nameEdit.getText().toString()));
+                viewModel.addUser(new User(emailEdit.getText().toString(), nameEdit.getText().toString()), getContext());
             }
         });
 
-        viewModel.usersLivedata.observe(getViewLifecycleOwner(), new Observer<ArrayList<User>>() {
+        viewModel.getUsers(getContext()).observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
-            public void onChanged(ArrayList<User> users) {
-                userAdapter.setUsers(users);
+            public void onChanged(List<User> users) {
+                userAdapter.setUsers(new ArrayList<>(users));
             }
         });
-        viewModel.getUsers();
 
     }
 }
